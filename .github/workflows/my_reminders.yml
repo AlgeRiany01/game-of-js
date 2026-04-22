@@ -1,1 +1,20 @@
 
+name: Telegram Reminder Action
+
+on:
+  push:
+    branches:
+      - main
+    # الكود سيعمل فقط عند تعديل ملفات معينة، أو يمكنك حذف paths ليعمل عند أي تغيير
+    paths:
+      - '**.txt' 
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Message to Telegram
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="✅ تم تحديث المستودع! تحقق من ملف my reminder الخاص بك."
