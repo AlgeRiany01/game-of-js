@@ -1,1 +1,29 @@
+name: Connection Test Workflow
 
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    # سيقوم بالتشغيل كل دقيقة خلال الساعة 20 بتوقيت UTC (التي تقابل 22 في ليبيا)
+    - cron: '* 20 * * *' 
+
+jobs:
+  test_reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Test Messages
+        run: |
+          # الحصول على الوقت بتوقيت UTC
+          TIME_UTC=$(date +%H:%M)
+          # تحويل الوقت لتوقيت ليبيا (UTC+2) للعرض فقط في الرسالة
+          TIME_LIBYA=$(date -d '2 hours' +%H:%M)
+          
+          MSG="🧪 تجربة (كل دقيقة): النظام شغال تمام. 
+          🕒 الوقت بتوقيت ليبيا: $TIME_LIBYA
+          🌐 التوقيت العالمي UTC: $TIME_UTC"
+
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d text="$MSG"
